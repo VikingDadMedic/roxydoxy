@@ -1,0 +1,480 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol", "fullTextSearch", "filteredRelationCount"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+
+  image    String?
+  accounts Account[]
+  sessions Session[]
+
+  picture       String?
+  hasOptInEmail Boolean? @default(false) @map("has_opt_in_email")
+
+  projects      Project[]
+  agents        Agent[]
+  datastores    Datastore[]
+  datasources   AppDatasource[]
+  subscriptions Subscription[]  @relation("user")
+  apiKeys       UserApiKey[]
+  usage         Usage?
+  conversations Conversation[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Usage {
+  id String @id @default(cuid())
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  nbAgentQueries        Int @default(0) @map("nb_agent_queries")
+  nbDatastoreQueries    Int @default(0) @map("nb_datastore_queries")
+  nbUploadedBytes       Int @default(0) @map("nb_uploaded_bytes")
+  nbDataProcessingBytes Int @default(0) @map("nb_data_processing_bytes")
+  nbModelTokens         Int @default(0) @map("nb_tokens")
+
+  @@map("usages")
+}
+
+model Project {
+  id        String @id @default(cuid())
+  subdomain String @unique
+  ownerId   String @map("user_id")
+  owner     User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name      String
+
+  disabled Boolean? @default(false)
+
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
+model Datastore {
+  id String @id @default(cuid())
+
+  name        String
+  description String?
+  type        DatastoreType
+  datasources AppDatasource[]
+  visibility  DatastoreVisibility @default(private)
+  apiKeys     DatastoreApiKey[]
+  tool        Tool[]
+
+  pluginIconUrl              String? @map("plugin_icon_url")
+  pluginName                 String? @map("plugin_name")
+  pluginDescriptionForHumans String? @map("plugin_description_for_humans")
+  pluginDescriptionForModel  String? @map("plugin_description_for_model")
+
+  config Json?
+
+  ownerId String? @map("owner_id")
+  owner   User?   @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  messagesBNP MessageBNP[]
+
+  @@map("data_stores")
+}
+
+// Naming the model Datasource conflicts with prisma
+// https://github.com/prisma/prisma/issues/12332
+model AppDatasource {
+  id     String           @id @default(cuid())
+  type   DatasourceType
+  name   String
+  status DatasourceStatus @default(unsynched)
+
+  config Json?
+
+  datastoreId String?    @map("datastore_id")
+  datastore   Datastore? @relation(fields: [datastoreId], references: [id], onDelete: Cascade)
+
+  ownerId String? @map("owner_id")
+  owner   User?   @relation(fields: [ownerId], references: [id])
+
+  nbChunks Int? @default(0) @map("nb_chunks")
+  textSize Int? @default(0) @map("text_size")
+
+  hash String?
+
+  nbSynch   Int?      @default(0) @map("nb_synch")
+  lastSynch DateTime? @map("last_synch")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("data_sources")
+}
+
+model UserApiKey {
+  id  String @id @default(cuid())
+  key String @unique()
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("user_api_keys")
+}
+
+model DatastoreApiKey {
+  id  String @id @default(cuid())
+  key String @unique()
+
+  datastoreId          String?               @map("datastore_id")
+  datastore            Datastore?            @relation(fields: [datastoreId], references: [id], onDelete: Cascade)
+  externalIntegrations ExternalIntegration[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("datastore_api_keys")
+}
+
+model Agent {
+  id String @id @default(cuid())
+
+  name        String
+  description String
+  prompt      String?
+  promptType  PromptType @default(customer_support) @map("prompt_type")
+  iconUrl     String?    @map("icon_url")
+  temperature Float      @default(0.0)
+
+  visibility    AgentVisibility @default(private)
+  conversations Conversation[]
+
+  ownerId             String?               @map("owner_id")
+  owner               User?                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  externalIntegration ExternalIntegration[]
+
+  nbQueries Int? @default(0) @map("nb_queries")
+
+  interfaceConfig Json? @map("interface_config")
+
+  tools Tool[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("agents")
+}
+
+model Conversation {
+  id        String  @id @default(cuid())
+  visitorId String? @map("visitor_id")
+  userId    String? @map("user_id")
+  user      User?   @relation(fields: [userId], references: [id])
+
+  agent    Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId  String?   @map("agent_id")
+  messages Message[]
+
+  channel ConversationChannel @default(dashboard)
+
+  metadata Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([visitorId], type: Hash)
+  @@map("conversations")
+}
+
+model Message {
+  id             String        @id @default(cuid())
+  text           String
+  from           MessageFrom
+  conversationId String?       @map("conversation_id")
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  read Boolean? @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("messages")
+}
+
+model Tool {
+  id   String   @id @default(cuid())
+  type ToolType
+
+  agent   Agent?  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId String? @map("agent_id")
+
+  datastoreId String?    @map("datastore_id")
+  datastore   Datastore? @relation(fields: [datastoreId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("tools")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model ExternalIntegration {
+  id   String          @id @default(cuid())
+  type IntegrationType
+
+  integrationId    String  @unique @map("integration_id")
+  integrationToken String? @map("integration_token")
+
+  agentId String? @map("agent_id")
+  agent   Agent?  @relation(fields: [agentId], references: [id])
+
+  // DEPRECATED
+  apiKeyId String?          @map("api_key_id")
+  apiKey   DatastoreApiKey? @relation(fields: [apiKeyId], references: [id])
+
+  metadata Json?
+
+  @@map("external_integrations")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  active      Boolean  @default(false)
+  name        String
+  description String?
+  image       String?
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  prices      Price[]
+
+  @@map("products")
+}
+
+model Price {
+  id                String         @id @default(cuid())
+  productId         String         @map("product_id")
+  active            Boolean        @default(false)
+  currency          String
+  interval          PriceInterval?
+  unitAmount        Int?           @map("unit_amount")
+  interval_count    Int?
+  trial_period_days Int?
+  type              PriceType?
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  product           Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  subscriptions     Subscription[]
+
+  @@map("prices")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  plan                 SubscriptionPlan?  @default(level_3)
+  priceId              String
+  customerId           String             @map("customer_id")
+  status               SubscriptionStatus
+  start_date           DateTime?
+  ended_at             DateTime?
+  trial_end            DateTime?
+  trial_start          DateTime?
+  cancel_at            DateTime?
+  cancel_at_period_end Boolean?
+  canceled_at          DateTime?
+  metadata             Json?
+  coupon               String?
+
+  // projectId String?  @unique
+  // project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  price Price @relation(fields: [priceId], references: [id])
+
+  user   User?   @relation(name: "user", fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("subscriptions")
+}
+
+model MessageBNP {
+  id   String      @id @default(cuid())
+  text String
+  from MessageFrom
+
+  datastoreId String?    @map("datastore_id")
+  datastore   Datastore? @relation(fields: [datastoreId], references: [id], onDelete: Cascade)
+
+  read Boolean? @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("messages_bnp")
+}
+
+model XPBNPEval {
+  id         String  @id @default(cuid())
+  active     Boolean @default(false)
+  userName   String? @map("user_name")
+  feature    String?
+  usecase    String?
+  promptType String? @map("prompt_type")
+  prompt     String?
+  comment    String?
+  result     String?
+  score1     Int?    @map("score_1")
+  score2     Int?    @map("score_2")
+  score3     Int?    @map("score_3")
+  metadata   Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("xp_bnp_evals")
+}
+
+enum DatastoreVisibility {
+  public
+  private
+}
+
+enum AgentVisibility {
+  public
+  private
+}
+
+enum DatasourceStatus {
+  unsynched
+  pending
+  running
+  synched
+  error
+  usage_limit_reached
+}
+
+enum DatasourceType {
+  web_page
+  web_site
+  text
+  file
+  // html
+  // pdf
+  // notion
+}
+
+enum DatastoreType {
+  pinecone
+  qdrant
+}
+
+enum ToolType {
+  datastore
+  connector
+  agent
+}
+
+enum SubscriptionPlan {
+  level_0
+  level_1
+  level_2
+  level_3
+}
+
+enum IntegrationType {
+  website
+  crisp
+  slack
+}
+
+enum PriceType {
+  recurring
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  incomplete
+  incomplete_expired
+  past_due
+  trialing
+  unpaid
+}
+
+enum PriceInterval {
+  day
+  month
+  week
+  year
+}
+
+enum PromptType {
+  raw
+  customer_support
+}
+
+enum MessageFrom {
+  agent
+  human
+}
+
+enum ConversationChannel {
+  dashboard
+  website
+  slack
+  crisp
+}

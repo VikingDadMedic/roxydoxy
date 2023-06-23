@@ -1,0 +1,17 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+next.config.js
+wrangler.toml
+edge
+fly
+.parcel-cache
+dist
+packages
+.env.local
+.env.prod.local
+.dev

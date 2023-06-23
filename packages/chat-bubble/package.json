@@ -1,0 +1,19 @@
+{
+  "name": "@voyagersocial/chat-bubble",
+  "version": "1.0.21",
+  "description": "Roxie.ai Chat Bubble Widget",
+  "main": "chat-bubble.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voyagersocial/roxiedoxy.git"
+  },
+  "author": "VS",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voyagersocial/roxiedoxy/issues"
+  },
+  "homepage": "https://github.com/voyagersocial/roxiedoxy#readme"
+}
