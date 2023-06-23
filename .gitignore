@@ -47,3 +47,4 @@ packages/chat-bubble/chat-bubble*
 .pnpm-store/
 
 .dev/roxie/app.env
+.env
