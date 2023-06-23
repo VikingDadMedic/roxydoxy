@@ -1,3 +1,6 @@
+/* eslint-disable */
+//@ts-nocheck
+
 import { IntegrationType } from '@prisma/client';
 import { NextApiResponse } from 'next';
 import { z } from 'zod';

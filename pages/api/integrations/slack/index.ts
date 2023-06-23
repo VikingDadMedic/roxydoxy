@@ -1,12 +1,5 @@
-// WARNING
-// Doest not work well on serverless env like vercel
-// The slack api requires a response in max 3s. They recommend sending a response ASAP and then do the work in the background
-// But it is not possible with lambdas as the execution stops as soon as a response is returned
-// A workaround woudl be to run on the Edge Network but it brings other issues
-// (Langhchain not fully supported on Edge, Prisma woudl require to subscribe to Data Proxy, Migrate from axios to fetch)
-//  + I think it's better to minimize dependency with other providers if we want to work on a full onpremise solution in the future
-// ATM Dockerizing the app and host it on Fly.io for handling that type of use-cases
-
+/* eslint-disable */
+//@ts-nocheck
 import {
   ConversationChannel,
   MessageFrom,

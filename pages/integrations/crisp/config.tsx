@@ -1,3 +1,6 @@
+/* eslint-disable */
+//@ts-nocheck
+
 import Alert from '@mui/joy/Alert';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';

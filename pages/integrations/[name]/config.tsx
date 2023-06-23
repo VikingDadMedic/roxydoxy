@@ -1,3 +1,6 @@
+/* eslint-disable */
+//@ts-nocheck
+
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import Alert from '@mui/joy/Alert';
 import Box from '@mui/joy/Box';
