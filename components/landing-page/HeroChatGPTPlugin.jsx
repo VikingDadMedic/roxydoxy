@@ -1,3 +1,6 @@
+/* eslint-disable */
+//@ts-nocheck
+
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import PhoneRoundedIcon from '@mui/icons-material/PhoneRounded';

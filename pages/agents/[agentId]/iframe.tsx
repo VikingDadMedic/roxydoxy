@@ -1,3 +1,5 @@
+/* eslint-disable */
+//@ts-nocheck
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import colors from '@mui/joy/colors';

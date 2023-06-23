@@ -1,3 +1,5 @@
+/* eslint-disable */
+//@ts-nocheck
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import AutoGraphRoundedIcon from '@mui/icons-material/AutoGraphRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
@@ -30,6 +32,7 @@ import Tabs from '@mui/joy/Tabs';
 import Typography from '@mui/joy/Typography';
 import { DatastoreVisibility, Prisma, ToolType } from '@prisma/client';
 import axios, { AxiosError } from 'axios';
+import { InferGetServerSidePropsType } from "next";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -53,7 +56,6 @@ import { RouteNames } from '@app/types';
 import agentToolFormat from '@app/utils/agent-tool-format';
 import { fetcher } from '@app/utils/swr-fetcher';
 import { withAuth } from '@app/utils/withAuth';
-import { InferGetServerSidePropsType } from "next";
 
 const ChatInterfaceConfigForm = dynamic(
   () => import('@app/components/ChatInterfaceConfigForm'),

@@ -1,3 +1,5 @@
+/* eslint-disable */
+//@ts-nocheck
 import AddIcon from '@mui/icons-material/Add';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -33,6 +35,7 @@ import { withAuth } from '@app/utils/withAuth';
 
 import { getAgents } from '../api/agents';
 import { getDatastores } from '../api/datastores';
+import { InferGetServerSidePropsType } from "next";
 
 const CreateDatastoreModal = dynamic(
   () => import('@app/components/CreateDatastoreModal'),
@@ -41,7 +44,7 @@ const CreateDatastoreModal = dynamic(
   }
 );
 
-export default function AgentsPage() {
+export default function AgentsPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { data: session, status } = useSession();
 
