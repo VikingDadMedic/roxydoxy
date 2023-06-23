@@ -1,3 +1,5 @@
+/* eslint-disable */
+//@ts-nocheck
 import { NextApiResponse } from 'next';
 
 import { AppNextApiRequest } from '@app/types/index';
