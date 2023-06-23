@@ -22,7 +22,7 @@ import {
 } from '@prisma/client';
 import axios from 'axios';
 import { blake3 } from 'hash-wasm';
-import { GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -39,7 +39,7 @@ import { getConnectedWebsites } from '@app/utils/crisp';
 import prisma from '@app/utils/prisma-client';
 import { withAuth } from '@app/utils/withAuth';
 
-export default function CrispConfig(props: { agent: Agent }) {
+export default function CrispConfig(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const session = useSession();
   const router = useRouter();
 

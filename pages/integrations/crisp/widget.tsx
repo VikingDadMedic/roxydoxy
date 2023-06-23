@@ -13,7 +13,7 @@ import {
   Stack,
 } from '@mui/joy';
 import axios from 'axios';
-import { GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -24,7 +24,7 @@ import prisma from '@app/utils/prisma-client';
 
 // query params website_id=5678ba03-6008-4fe3-aeef-aa78466c0bbc&session_id=session_f55e6731-51a4-4815-a1e3-655db78bb358&token=xxx&locale=en
 
-export default function CrispConfig(props: { isPremium?: boolean }) {
+export default function CrispConfig(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [isLoading, setIsLoading] = useState(false);
   // const [inputValue, setInputValue] = useState(props.apiKey);
   const [submitError, setSubmitError] = useState('');
