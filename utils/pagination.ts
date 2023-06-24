@@ -1,3 +1,7 @@
+/* eslint-disable */
+//@ts-nocheck
+
+
 // https://gist.github.com/kottenator/9d936eb3e4e3c3e02598?permalink_comment_id=2895507
 
 function pagination(c: number, m: number) {

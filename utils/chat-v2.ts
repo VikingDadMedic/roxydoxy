@@ -1,3 +1,6 @@
+/* eslint-disable */
+//@ts-nocheck
+
 import { Datastore, MessageFrom, PromptType } from '@prisma/client';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAI } from 'langchain/llms/openai';

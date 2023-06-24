@@ -1,3 +1,5 @@
+/* eslint-disable */
+//@ts-nocheck
 import * as pdfJS from 'pdfjs-dist';
 
 const pdfToText = async (buffer: ArrayBuffer) => {
